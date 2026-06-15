@@ -71,15 +71,6 @@ public class TelaVendas extends JPanel {
             String descInput = JOptionPane.showInputDialog(this,
                 "Desconto em % (0 para nenhum):", "Nota Fiscal", JOptionPane.PLAIN_MESSAGE);
             if (descInput == null) return;
-            /* 
-            try {
-                double desc = descInput.isBlank() ? 0 : Double.parseDouble(descInput.trim());
-                NotaFiscal nf = new NotaFiscal(v, desc);
-                exibirTexto("Nota Fiscal #" + nf.getNumero(), nf.gerarTexto());
-            } catch (NumberFormatException ex) {
-                avisar("Desconto inválido.");
-            }
-            */
         });
 
         acoes.add(btnDetalhes);
@@ -128,7 +119,7 @@ public class TelaVendas extends JPanel {
             public boolean isCellEditable(int r, int c) { return false; }
         };
         JTable tabelaItens = new JTable(modeloItens);
-        estilizarTabela(tabelaItens);
+        estilizarTabela(tabelaItens); 
 
         // ── Painel add produto ────────────────────────────────────────────────
         JPanel addProduto = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 8));
@@ -138,7 +129,7 @@ public class TelaVendas extends JPanel {
         JComboBox<String> cbProduto = new JComboBox<>();
         for (Produtos p : sistema.getProdutos())
             cbProduto.addItem(p.getCodigo() + " - " + p.getNome() + " (Est: " + p.getEstoque() + ")");
-        cbProduto.setPreferredSize(new Dimension(260, 32));
+        cbProduto.setPreferredSize(new Dimension(180, 32));
 
         JSpinner spinQtd = new JSpinner(new SpinnerNumberModel(1, 1, 9999, 1));
         spinQtd.setPreferredSize(new Dimension(70, 32));
@@ -193,7 +184,7 @@ public class TelaVendas extends JPanel {
         dialog.add(centerPanel, BorderLayout.CENTER);
 
         // ── Rodapé ────────────────────────────────────────────────────────────
-        JButton btnFinalizar = TelaPrincipal.botaoSucesso("✔ Finalizar Venda");
+        JButton btnFinalizar = TelaPrincipal.botaoSucesso("Finalizar Venda");
         JButton btnCancelar  = new JButton("Cancelar");
         btnCancelar.addActionListener(e -> dialog.dispose());
 
@@ -220,15 +211,10 @@ public class TelaVendas extends JPanel {
             try {
                 sistema.registrarVenda(venda);
                 atualizarTabela();
-                int resp = JOptionPane.showConfirmDialog(dialog,
-                    "Venda #" + venda.getId() + " registrada!\nDeseja emitir a Nota Fiscal?",
-                    "Sucesso", JOptionPane.YES_NO_OPTION);
-                /* 
-                if (resp == JOptionPane.YES_OPTION) {
-                    NotaFiscal nf = new NotaFiscal(venda);
-                    exibirTexto("Nota Fiscal #" + nf.getNumero(), nf.gerarTexto());
-                }
-                */
+                JOptionPane.showMessageDialog(dialog,
+                    "Venda #" + venda.getId() + " registrada com sucesso!",
+                    "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+                
                 dialog.dispose();
             } catch (VendaFinalizadaException ex) {
                 avisar(ex.getMessage());
