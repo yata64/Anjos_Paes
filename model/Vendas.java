@@ -6,25 +6,15 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-/**
- * Venda possui ASSOCIAÇÃO com:
- *   - Clientes  → quem comprou
- *   - Funcionario → quem vendeu
- *   - ArrayList<Produtos> → o que foi vendido
- *
- * Implementa Relatoravel → demonstra uso de interface.
- * BUG CORRIGIDO: produto.preco() → produto.getPreco()
- */
 public class Vendas implements Relatorio, Serializable {
 
     private static final long serialVersionUID = 1L;
-
     public static int contadorVendas = 0;
 
     private int id;
     private Clientes cliente;
     private Funcionario funcionario;
-    private ArrayList<Produtos> produtos; // ArrayList conforme rubrica
+    private ArrayList<Produtos> produtos;
     private LocalDate dataVenda;
     private String status;
 
@@ -37,27 +27,14 @@ public class Vendas implements Relatorio, Serializable {
         this.status      = "CONCLUIDA";
     }
 
-    public void adicionarProduto(Produtos produto) {
-        produtos.add(produto);
-    }
+    public void adicionarProduto(Produtos produto) { produtos.add(produto); }
+    public void removerProduto(Produtos produto)   { produtos.remove(produto); }
 
-    public void removerProduto(Produtos produto) {
-        produtos.remove(produto);
-    }
-
-    /**
-     * BUG CORRIGIDO: era produto.preco() — método não existe.
-     * Correto: produto.getPreco()
-     */
     public double calcularTotal() {
         double total = 0;
-        for (Produtos produto : produtos) {
-            total += produto.getPreco(); // ← CORREÇÃO DO BUG
-        }
+        for (Produtos produto : produtos) total += produto.getPreco();
         return total;
     }
-
-    // ─── Implementação da interface Relatoravel ───────────────────────────────
 
     @Override
     public String gerarRelatorio() {
@@ -82,30 +59,42 @@ public class Vendas implements Relatorio, Serializable {
         return sb.toString();
     }
 
-    // ─── Getters e Setters ────────────────────────────────────────────────────
-
-    public int getId()                       { return id; }
-    public void setId(int id)               { this.id = id; }
-
-    public Clientes getCliente()             { return cliente; }
-    public void setCliente(Clientes c)      { this.cliente = c; }
-
-    public Funcionario getFuncionario()      { return funcionario; }
-    public void setFuncionario(Funcionario f){ this.funcionario = f; }
-
-    public ArrayList<Produtos> getProdutos() { return produtos; }
-    public void setProdutos(ArrayList<Produtos> produtos) { this.produtos = produtos; }
-
-    public LocalDate getDataVenda()          { return dataVenda; }
-    public void setDataVenda(LocalDate d)   { this.dataVenda = d; }
-
-    public String getStatus()               { return status; }
-    public void setStatus(String status)    { this.status = status; }
-
+    /**
+     * Formato CSV legível e recuperável:
+     * id;cpfCliente;nomeCliente;matriculaFuncionario;nomeFuncionario;data;status;cod1,cod2
+     *
+     * CPF e matrícula → chaves para recarregar os objetos
+     * nomeCliente e nomeFuncionario → legibilidade no arquivo
+     */
     public String toCSV() {
-        return id + ";" + cliente.getNome() + ";" + funcionario.getNome() +
-               ";" + dataVenda + ";" + String.format("%.2f", calcularTotal()) + ";" + status;
+        StringBuilder codigos = new StringBuilder();
+        for (int i = 0; i < produtos.size(); i++) {
+            if (i > 0) codigos.append(",");
+            codigos.append(produtos.get(i).getCodigo());
+        }
+        return id                        + ";" +
+               cliente.getCpf()         + ";" +
+               cliente.getNome()        + ";" +
+               funcionario.getMatricula() + ";" +
+               funcionario.getNome()    + ";" +
+               dataVenda               + ";" +
+               status                  + ";" +
+               codigos;
     }
+
+    // Getters e Setters
+    public int getId()                             { return id; }
+    public void setId(int id)                      { this.id = id; }
+    public Clientes getCliente()                   { return cliente; }
+    public void setCliente(Clientes c)             { this.cliente = c; }
+    public Funcionario getFuncionario()            { return funcionario; }
+    public void setFuncionario(Funcionario f)      { this.funcionario = f; }
+    public ArrayList<Produtos> getProdutos()       { return produtos; }
+    public void setProdutos(ArrayList<Produtos> p) { this.produtos = p; }
+    public LocalDate getDataVenda()                { return dataVenda; }
+    public void setDataVenda(LocalDate d)          { this.dataVenda = d; }
+    public String getStatus()                      { return status; }
+    public void setStatus(String status)           { this.status = status; }
 
     @Override
     public String toString() {
