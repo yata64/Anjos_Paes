@@ -95,6 +95,7 @@ public class Sistema {
             throw new EstoqueInsuficienteException(
                     produto.getNome(), produto.getEstoque(), quantidade);
         produto.reduzirEstoque(quantidade);
+        salvarTodosProdutos();
     }
 
     public List<Produtos> getProdutos() { return produtos; }
@@ -106,11 +107,22 @@ public class Sistema {
             if (v.getId() == venda.getId())
                 throw new VendaFinalizadaException(venda.getId());
         vendas.add(venda);
-        PersistenciaService.salvarDados(ARQ_VENDAS, venda.toCSV());
+        salvarTodasVendas();
     }
 
     public List<Vendas> getVendas() { return vendas; }
 
+    public void salvarTodosProdutos() {
+        List<String> linhas = new ArrayList<>();
+        for (Produtos p : produtos) linhas.add(p.toCSV());
+            PersistenciaService.reescreverDados(ARQ_PRODUTOS, linhas);
+    }
+
+    public void salvarTodasVendas() {
+        List<String> linhas = new ArrayList<>();
+        for (Vendas v : vendas) linhas.add(v.toCSV());
+            PersistenciaService.reescreverDados(ARQ_VENDAS, linhas);
+    }
     // ══════════════════════════ RELATÓRIOS ════════════════════════════════════
 
     public void gerarRelatorioVendas() {

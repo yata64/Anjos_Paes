@@ -68,6 +68,7 @@ public class TelaProdutos extends JPanel {
                 "Confirmar exclusão", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if (confirm == JOptionPane.YES_OPTION) {
                 sistema.getProdutos().remove(row);
+                sistema.salvarTodosProdutos();
                 atualizarTabela();
             }
         });
@@ -85,6 +86,7 @@ public class TelaProdutos extends JPanel {
                     int novoEstoque = Integer.parseInt(input.trim());
                     if (novoEstoque < 0) { avisar("Estoque não pode ser negativo."); return; }
                     p.setEstoque(novoEstoque);
+                    sistema.salvarTodosProdutos();
                     atualizarTabela();
                     JOptionPane.showMessageDialog(this, "Estoque atualizado para " + novoEstoque + " unidades.");
                 } catch (NumberFormatException ex) {
@@ -148,6 +150,7 @@ public class TelaProdutos extends JPanel {
                     existente.setPreco(preco);
                     existente.setEstoque(estoque);
                     existente.setCategoria(fCategoria.getText().trim());
+                    sistema.salvarTodosProdutos();
                 } else {
                     sistema.cadastrarProduto(new Produtos(
                         fCodigo.getText().trim(), fNome.getText().trim(),
